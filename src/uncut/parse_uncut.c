@@ -7,6 +7,7 @@
 
 #include "filecut.h"
 
+/* cree un bon chemin */
 char *check_and_modif_path(char *path)
 {
     int i = 0;
@@ -45,12 +46,13 @@ int verif_is_repo(char *path)
 
 int parse_uncut(char **av)
 {
+    /* Permet d'avoir un chemin correct*/
     char *path = check_and_modif_path(av[2]);
-    if (verif_is_repo(path) == 84) {
+    if (verif_is_repo(path) == 84) { // verif que ce soit bien un répertoire et non un fichier sinon il retourne 84
         free (path);
         return (84);
     }
-    if (uncut(path) == 84) {
+    if (uncut(path) == 84) { // algo de remise à l'état initiale
         free (path);
         return (84);
     }

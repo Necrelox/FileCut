@@ -7,21 +7,6 @@
 
 #include "filecut.h"
 
-filecut_s *create_a_good_nbFiles(filecut_s *origin)
-{
-    int avgVerif;
-    origin->nbFiles = rand() % NBFILES_MAX;
-    while (origin->nbFiles < 2) {
-        origin->nbFiles = rand() % NBFILES_MAX;
-    }
-    if (origin->sizeMin > 0) {
-        avgVerif = origin->originSize / NBFILES_MAX;
-        while (avgVerif < origin->sizeMin || origin->nbFiles < 2) {
-            origin->nbFiles = rand() % NBFILES_MAX;
-        }
-    }
-    return (origin);
-}
 /* Cette fonction au nom beaucoup trop long, permet de verifier les arguments, et si il est possible de les appliquer
     il mettra certain paramètre à une valeur par défaut */
 filecut_s *verify_arg_and_set_filecut_settings(int ac, char **av)

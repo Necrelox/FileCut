@@ -106,20 +106,41 @@ void create_newcase_chainfiles(files_s *chainFiles, int size);
 files_s *prepare_chain_random_files_and_size(filecut_s *origin);
 /* Verif if all files is finish */
 int verif_all_file_complete(files_s *chainFiles);
+/* Create a good path for create bloc */
+char *prepare_new_path(filecut_s *origin);
 /* Create file with chain list and write */
 void create_file_and_write(files_s *chainFiles, filecut_s *origin);
 /* Algo Cut Files */
 void cut(filecut_s *origin);
 
 /*      SRC/uncut/parse_uncut.c     */
-/* Parser for uncut a multiples files */
-int parse_uncut(char **av);
+/* Create a good path */
+char *check_and_modif_path(char *path);
 /* Verif if it's a repository */
 int verif_is_repo(char *path);
+/* Parser for uncut a multiples files */
+int parse_uncut(char **av);
 
 
 /*      SRC/uncut/uncut.c       */
-char *my_strdup(char *str);
+/* Free list*/
+void free_chain(files_s *chain);
+/* Verif its file is not a repository, and is not a .pine*/
+int verif_its_good_file(char *path);
+/* Check if header is good and return header to prepare_chain_file*/
+char *recup_header_in_file(char *name);
+/* Create Structure and add in chain list */
+void create_newcase_chain(files_s *chain, char *path, char *header);
+/*Create a chain list of bloc and get header*/
+files_s *prepare_chain_file(char *path);
+/* Transform header string to tab */
+char **header_to_tab(char *header);
+/* get info of header */
+fileuncut_s *get_and_prepare_info(files_s *chain, char *path);
+/* Check all bloc is empty */
+int verif_all_file_is_empty(files_s *chain);
+/* Create and write the original file */
+void create_original_file(files_s *chain, fileuncut_s *origin);
 /* Algo UnCut multiples files */
 int uncut(char *path);
 

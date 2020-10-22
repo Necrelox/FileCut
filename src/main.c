@@ -45,7 +45,7 @@ int main (int ac, char **av)
     }
     else if ((ac == 2 || ac == 3) && my_strcmp(av[1], "uncut") == 0) {
         clock_t t1 = clock();
-        if (parse_uncut(av) == 84)
+        if (parse_uncut(av) == 84) //vérification + remise en l'état si il y'a des blocs sinon retourne 84
             return (84);
         clock_t t2 = clock();
         printf("%f\n", (double)(t2 - t1 ) / CLOCKS_PER_SEC);
