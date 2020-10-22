@@ -185,13 +185,10 @@ void cut(filecut_s *origin)
 {
     /*je crée ma chaine de fichiers avec la fonction prepare_chain_random_files_and_size(origin);*/
     files_s *chainFiles = prepare_chain_random_files_and_size(origin);
-    /* je cree une autre chaine qui va me permettre */
-    files_s *freeChain = chainFiles->first, *temp = chainFiles->first;
-    int cal = 0;
-    for (int i = 0;temp != NULL; temp = temp->next, i++) {
-        //printf ("Fichier (%d), size : %d\n", i, temp->size);
-        cal += temp->size;
-    }
+    /* je cree une autre chaine qui va me permettre qui pointe vers ma chaine chainFiles 
+    cele va me permettre d'avancer tout libérant la mémoire*/
+    files_s *freeChain = chainFiles->first;
+
     create_file_and_write(chainFiles, origin);
     for (chainFiles = chainFiles->first;chainFiles != NULL;) {
         freeChain = chainFiles;

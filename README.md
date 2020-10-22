@@ -1,2 +1,2 @@
 # FileCut
-Readme en cours..
+Cut Files
