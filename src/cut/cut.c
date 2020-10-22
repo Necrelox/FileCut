@@ -7,6 +7,7 @@
 
 #include "filecut.h"
 
+/* Cree et ajoute une nouvelle structure à la chaîne de fichiers */
 void create_newcase_chainfiles(files_s *chainFiles, int size)
 {
     /* cree une nouvelle case */
@@ -88,6 +89,7 @@ files_s *prepare_chain_random_files_and_size(filecut_s *origin)
     return (NULL);
 }
 
+/* Vérification de la chaine si chaque bloc à était rempli */
 int verif_all_file_complete(files_s *chainFiles)
 {
     files_s *temp = chainFiles->first;
@@ -98,6 +100,7 @@ int verif_all_file_complete(files_s *chainFiles)
     return (0);
 }
 
+/*Modifie le chemin qui servira à la création des blocs */
 char *prepare_new_path(filecut_s *origin)
 {
     char *newpath;
@@ -128,17 +131,23 @@ char *prepare_new_path(filecut_s *origin)
     return (NULL);
 }
 
+/* cree et ecris les blocs(fichiers) de façons pseudo aléatoire à partir de la graine seed contenant le pid (légèrement différent sur window)*/
 void create_file_and_write(files_s *chainFiles, filecut_s *origin)
 {
+    /* Creation des différentes variables et ouverture du fichier d'origine en lecture */
     FILE *fo = fopen(origin->path, "r");
     files_s *temp = chainFiles->first;
     int blockSize = 0, i = 0;
     char *buff;
     char *oldPath = my_strdup(origin->path);
 
+    /*  je reinitialise rand avec la même graine*/
     srand(origin->seed);
+    /* je modifie le path pour creer les bloc au même emplacement que le fichier d'origine*/
     origin->path = prepare_new_path(origin);
     
+    /* je passe dans toute la chaîne pour creer le nom ainsi que le header
+    cree les bloc et ouvrir tout les flux en ajout et y ajouter le header */
     for (temp = chainFiles->first; temp != NULL; temp = temp->next, i++) {
         temp->name = malloc(sizeof(char) * (30));
         temp->header = malloc(sizeof(char) * (1000000));
@@ -150,6 +159,9 @@ void create_file_and_write(files_s *chainFiles, filecut_s *origin)
         fwrite(temp->header, strlen(temp->header), 1, temp->fd);
     }
 
+    /* cette partie va faire tout les bloc jusqu'à ce qu'ils ont été complété
+    selection du fichier en pseudo aléa + ecriture avec un buffer correspondant à la taille du fichier / 10
+    si la taille restante est au dessus de 1000 cela permet d'être plus rapide (cette partie peut être modifié à l'avenir*/
     for (int choose = 0 ; verif_all_file_complete(chainFiles);) {
         choose = rand() % (origin->nbFiles);
         for (temp = chainFiles->first; temp != NULL && choose > 0; temp = temp->next, choose--);
@@ -173,9 +185,11 @@ void create_file_and_write(files_s *chainFiles, filecut_s *origin)
             }
         }
     }
+    /* Fermeture de tout les flux des blocs*/
     for (temp = chainFiles->first; temp != NULL; temp = temp->next) {
         fclose (temp->fd);
     }
+    /*fermeture du flux et suppressuon du fichier d'origine*/
     fclose (fo);
     remove(oldPath);
     free (oldPath);
@@ -189,7 +203,11 @@ void cut(filecut_s *origin)
     cele va me permettre d'avancer tout libérant la mémoire*/
     files_s *freeChain = chainFiles->first;
 
+    /* Appelle de la fonction de creation et d'écriture des bloc(fichiers) avec la chaine crée au dessus ainsi que la structure origin
+    contenant les paramètre nombre de fichiers tailles ect */
     create_file_and_write(chainFiles, origin);
+
+    /* Libération de mémoire de la liste chaînée */
     for (chainFiles = chainFiles->first;chainFiles != NULL;) {
         freeChain = chainFiles;
         chainFiles = chainFiles->next;
