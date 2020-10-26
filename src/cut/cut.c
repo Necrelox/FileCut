@@ -33,6 +33,7 @@ files_s *prepare_chain_random_files_and_size(filecut_s *origin)
     float avg1 = 0;
     int dif = 0, rest = 0;
     int temp = 0, temp2 = 0;
+    MTRand r = seedRand(origin->seed);
 
     /* j'initialise les pointeurs */
     chainFiles->first = chainFiles;
@@ -56,26 +57,26 @@ files_s *prepare_chain_random_files_and_size(filecut_s *origin)
     /* si la moyenne est supérieur à 1 alors* je vais donner une taille aléatoire
     pour le premiere bloc, qui sera stocké dans la première structure de la chaîne */
     if (origin->avgSize > 1) {
-        chainFiles->size = rand() % (origin->avgSize + dif + 1);
+        chainFiles->size = genRandLong(&r) % (origin->avgSize + dif + 1);
         if ((origin->avgSize + dif) > 4)
             while (chainFiles->size <= (((origin->avgSize + dif) / 4) * 3))
-                chainFiles->size = rand() % (origin->avgSize + dif + 1);
+                chainFiles->size =  genRandLong(&r) % (origin->avgSize + dif + 1);
         if ((origin->avgSize + dif) <= 4)
             while (chainFiles->size <= 1)
-                chainFiles->size = rand() % (origin->avgSize + dif + 1);
+                chainFiles->size = genRandLong(&r) % (origin->avgSize + dif + 1);
         rest = (origin->avgSize + dif) - chainFiles->size;
         temp = chainFiles->size;
 
         /* je vais cree une nouvelle structure et la lié à ma chaine
         je donne à chaque structure une taille aléatoire selon la taille moyenne*/
         for (int x = 1; x < (origin->nbFiles - 1) ; x++) {
-            temp2 = rand() % (origin->avgSize + rest + 1);
+            temp2 = genRandLong(&r) % (origin->avgSize + rest + 1);
             if ((origin->avgSize + rest) > 4)
                 while (temp2 <= (((origin->avgSize + rest) / 4) * 3))
-                    temp2 = rand() % (origin->avgSize + rest + 1);
+                    temp2 = genRandLong(&r) % (origin->avgSize + rest + 1);
             if ((origin->avgSize + rest) <= 4)
                 while (temp2 <= 1)
-                    temp2 = rand() % (origin->avgSize + rest + 1);
+                    temp2 = genRandLong(&r) % (origin->avgSize + rest + 1);
             rest = (origin->avgSize + rest) - temp2;
             create_newcase_chainfiles(chainFiles, temp2);
             temp += temp2;
@@ -142,7 +143,7 @@ void create_file_and_write(files_s *chainFiles, filecut_s *origin)
     char *oldPath = my_strdup(origin->path);
 
     /*  je reinitialise rand avec la même graine*/
-    srand(origin->seed);
+    MTRand r = seedRand(origin->seed);
     /* je modifie le path pour creer les bloc au même emplacement que le fichier d'origine*/
     origin->path = prepare_new_path(origin);
     
@@ -163,7 +164,7 @@ void create_file_and_write(files_s *chainFiles, filecut_s *origin)
     selection du fichier en pseudo aléa + ecriture avec un buffer correspondant à la taille du fichier / 10
     si la taille restante est au dessus de 1000 cela permet d'être plus rapide (cette partie peut être modifié à l'avenir*/
     for (int choose = 0 ; verif_all_file_complete(chainFiles);) {
-        choose = rand() % (origin->nbFiles);
+        choose = genRandLong(&r) % (origin->nbFiles);
         for (temp = chainFiles->first; temp != NULL && choose > 0; temp = temp->next, choose--);
         if (temp->size > 0) {
             if (temp->size > 1000) {

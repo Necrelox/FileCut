@@ -8,6 +8,7 @@
 NAME	=	libmy
 
 SRC	=	minilib.c	\
+		mtwister.c	\
 
 OBJ	=	$(SRC:.c=.o)
 

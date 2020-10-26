@@ -17,6 +17,22 @@ int help (void)
     return (0);
 }
 
+void test(int i)
+{
+    if (i == 1) {
+        printf ("Mersen Twister\n");
+        MTRand o = seedRand(1);
+        for (int x = 0; x < 1000; x++)
+            printf("%ld\n", genRandLong(&o) % 51);
+    }
+    else if (i == 0) {
+        printf ("Rand stdlib\n");
+        srand(1);
+        for (int x = 0; x < 1000; x++)
+            printf("%d\n", rand() % 51);
+    }
+}
+
 /* Fonction de départ */
 int main (int ac, char **av)
 {
@@ -28,7 +44,8 @@ int main (int ac, char **av)
     #else
         int seed = getpid();
     #endif
-
+    if (ac == 3 && my_strcmp(av[1], "rand") == 0)
+        test(atoi(av[2]));
     /* Permet de verifier le premier argument vaut -help alors il retourne la fonction help() */
     if ((ac < 2 || ac >= 7) || my_strcmp(av[1], "-help") == 0)
         return (help());
@@ -37,7 +54,6 @@ int main (int ac, char **av)
         la fonction parse_cut()*/
     else if (ac > 2 && ac < 7 && my_strcmp(av[1], "cut") == 0) {
         clock_t t1 = clock();
-        srand(seed); // J'initialise l'algo de rand une première fois avec le seed qui vaut le pid
         if (parse_cut(ac, av, seed) == 84) // va vérifier les arguments et découper le fichier si il y'a une erreur il retourne 84
             return (84);
         clock_t t2 = clock();

@@ -21,6 +21,7 @@
 #include <string.h>
 #include <time.h>
 #include <dirent.h>
+#include "mtwister.h"
 
 /*     LIB/minilib.c      */
 /* Compare two str if same str this function return 0*/

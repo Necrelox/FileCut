@@ -228,14 +228,14 @@ void create_original_file(files_s *chain, fileuncut_s *origin)
     /* j'initialise rand à partir de la graine récupéré des header
     et j'ouvre tout les flux en lecture de tout les blocs et je déplace ma tête de lecture juste
     après le header*/
-    srand(origin->seed);
+    MTRand r = seedRand(origin->seed);
     for (use = chain->first->next; use != NULL; use = use->next) {
         use->fd = fopen(use->name, "r");
         fseek(use->fd, strlen(use->header), SEEK_SET);
     }
     /*je refais l'algo de cut mais je remplis des bloc le fichier d'origine*/
     for (int choose = 0; verif_all_file_is_empty(chain); choose = 0) {
-        choose = rand() % (origin->nbFiles);
+        choose = genRandLong(&r) % (origin->nbFiles);
         for (use = chain->first->next; use != NULL && use->idBlock != choose; use = use->next);
         if (use->size > 0) {
             if (use->size > 1000) {
