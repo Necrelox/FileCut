@@ -160,9 +160,7 @@ void create_file_and_write(files_s *chainFiles, filecut_s *origin)
     si la taille restante est au dessus de 1000 cela permet d'être plus rapide (cette partie peut être modifié à l'avenir*/
     for (int choose = 0 ; verif_all_file_complete(chainFiles);) {
         choose = genRandLong(&r) % (origin->nbFiles);
-        printf("%sChoose : %d%s", JAUNE, choose, NORMAL);
         for (temp = chainFiles->first; temp != NULL && choose > 0; temp = temp->next, choose--);
-        printf ("%s Size : %lld %s\n", BLEU, temp->size, NORMAL);
         if (temp->size > 0) {
             if (temp->size > 1000) {
                 blockSize = 0;
