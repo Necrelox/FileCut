@@ -70,7 +70,7 @@ int print_all_error(filecut_s *filecut, char **av)
 /*je verifie si les arguments sont compatible avec le fichier ou les autres arguments */
 int verif_arg(int ac, char **av, filecut_s *origin)
 {
-    int temp = 0; /*je cree une varible pour des calculs*/
+    unsigned int temp = 0; /*je cree une varible pour des calculs*/
 
     /* si il y'a 4 ou plus d'arguments je les vérifies*/
     if (ac >= 4) {
@@ -118,12 +118,12 @@ int verif_arg(int ac, char **av, filecut_s *origin)
             origin->sizeMax = atoi(av[5]);
             /* je verifie si il est pas plus grand que la taille du fichier d'origine sinon je retourne l'erreur*/
             if (origin->sizeMax > origin->originSize) {
-                printf ("%sSIZEMAX %d IS TOO BIG THAN ORIGINSIZE %d %s\n", ROUGE, origin->sizeMax, origin->originSize, NORMAL);
+                printf ("%sSIZEMAX %lld IS TOO BIG THAN ORIGINSIZE %lld %s\n", ROUGE, origin->sizeMax, origin->originSize, NORMAL);
                 return (ERROR_ARG5_SIZEMAX);
             }
             /* Je vérifie qu'il soit pas plus petit que sizemin sinon je retourne l'erreur */
             if (origin->sizeMax < origin->sizeMin) {
-                printf ("%sSIZEMAX %d IS TOO SMALL THAN SIZEMIN %d %s\n", ROUGE, origin->sizeMax, origin->originSize, NORMAL);
+                printf ("%sSIZEMAX %lld IS TOO SMALL THAN SIZEMIN %lld %s\n", ROUGE, origin->sizeMax, origin->originSize, NORMAL);
                 return (ERROR_ARG5_SIZEMAX);
             }
         }

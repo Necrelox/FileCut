@@ -192,9 +192,9 @@ fileuncut_s *get_and_prepare_info(files_s *chain, char *path)
     for (; use != NULL; use = use->next) {
         tab = header_to_tab(use->header);
         origin->nbFiles = atoi(tab[0]);
-        origin->seed = atoi(tab[1]);
-        use->size = atoi(tab[2]);
-        origin->originSize = atoi(tab[3]);
+        origin->seed = atol(tab[1]);
+        use->size = atoll(tab[2]);
+        origin->originSize = atoll(tab[3]);
         use->idBlock = atoi(tab[4]);
         for (int i = 0; tab[i] != NULL; i++)
             free (tab[i]);
@@ -276,6 +276,7 @@ int uncut(char *path)
     fileuncut_s *origin = get_and_prepare_info(chain, path);
     /*je vais recree grâce à la chaîne et à la structure origin le fichier d'origine */
     create_original_file(chain, origin);
+    free_chain(chain);
     free (origin->path);
     free (origin);
     return (0);

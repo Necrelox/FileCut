@@ -49,20 +49,20 @@
 
 typedef struct filecut_t
 {
-    int seed;
+    long seed;
     char *path;
     char *containFile;
-    int originSize;
+    long long originSize;
     int nbFiles;
-    int sizeMin, avgSize, sizeMax;
+    long long sizeMin, avgSize, sizeMax;
     int error;
 }filecut_s;
 
 typedef struct fileuncut_t
 {
-    int seed;
+    long int seed;
     int nbFiles;
-    int originSize;
+    long long originSize;
     char *path;
 }fileuncut_s;
 
@@ -71,7 +71,7 @@ typedef struct files_t
     FILE *fd;
     char *name;
     int idBlock;
-    int size;
+    long long size;
     int sizeHeader;
     char *header;
     struct files_t *next, *prev, *first;
@@ -101,7 +101,7 @@ int verif_if_number(char *str);
 
 /*      SRC/cut/cut.c       */
 /* create a case and add to chain_list */
-void create_newcase_chainfiles(files_s *chainFiles, int size);
+void create_newcase_chainfiles(files_s *chainFiles, long long size);
 /* Prepare a chain_list one structure is equivalent a files*/
 files_s *prepare_chain_random_files_and_size(filecut_s *origin);
 /* Verif if all files is finish */

@@ -8,7 +8,7 @@
 #include "filecut.h"
 
 /* Cree et ajoute une nouvelle structure à la chaîne de fichiers */
-void create_newcase_chainfiles(files_s *chainFiles, int size)
+void create_newcase_chainfiles(files_s *chainFiles, long long size)
 {
     /* cree une nouvelle case */
     files_s *newcase = malloc(sizeof(*newcase));
@@ -28,12 +28,10 @@ files_s *prepare_chain_random_files_and_size(filecut_s *origin)
     /*creation de la premiere structure de la chaine
     ainsi que de multiple variable pour des calcul en float et aussi en int */
     files_s *chainFiles = malloc(sizeof(*chainFiles));
-    float OriginSize = origin->originSize;
-    float nbFiles;
-    float avg1 = 0;
-    int dif = 0, rest = 0;
-    int temp = 0, temp2 = 0;
     MTRand r = seedRand(origin->seed);
+
+    long long dif = 0, rest = 0;
+    long long temp = 0, temp2 = 0;
 
     /* j'initialise les pointeurs */
     chainFiles->first = chainFiles;
@@ -45,14 +43,8 @@ files_s *prepare_chain_random_files_and_size(filecut_s *origin)
         origin->nbFiles = 5;
 
     /* je calcul la moyenne aisi que la différence selon OriginSize / nbFiles*/
-    nbFiles = origin->nbFiles;
-    avg1 = (OriginSize / nbFiles);
-    origin->avgSize = avg1;
-    avg1 -= origin->avgSize;
-    avg1 *= nbFiles;
-    dif = avg1;
-    avg1 -= dif;
-    avg1 >= 0.5 ? dif++ :0; 
+    origin->avgSize = origin->originSize / origin->nbFiles;
+    dif = origin->originSize - (origin->avgSize * origin->nbFiles);
 
     /* si la moyenne est supérieur à 1 alors* je vais donner une taille aléatoire
     pour le premiere bloc, qui sera stocké dans la première structure de la chaîne */
@@ -61,6 +53,7 @@ files_s *prepare_chain_random_files_and_size(filecut_s *origin)
         if ((origin->avgSize + dif) > 4)
             while (chainFiles->size <= (((origin->avgSize + dif) / 4) * 3))
                 chainFiles->size =  genRandLong(&r) % (origin->avgSize + dif + 1);
+
         if ((origin->avgSize + dif) <= 4)
             while (chainFiles->size <= 1)
                 chainFiles->size = genRandLong(&r) % (origin->avgSize + dif + 1);
@@ -69,17 +62,19 @@ files_s *prepare_chain_random_files_and_size(filecut_s *origin)
 
         /* je vais cree une nouvelle structure et la lié à ma chaine
         je donne à chaque structure une taille aléatoire selon la taille moyenne*/
-        for (int x = 1; x < (origin->nbFiles - 1) ; x++) {
-            temp2 = genRandLong(&r) % (origin->avgSize + rest + 1);
-            if ((origin->avgSize + rest) > 4)
-                while (temp2 <= (((origin->avgSize + rest) / 4) * 3))
-                    temp2 = genRandLong(&r) % (origin->avgSize + rest + 1);
-            if ((origin->avgSize + rest) <= 4)
-                while (temp2 <= 1)
-                    temp2 = genRandLong(&r) % (origin->avgSize + rest + 1);
-            rest = (origin->avgSize + rest) - temp2;
-            create_newcase_chainfiles(chainFiles, temp2);
-            temp += temp2;
+        if (origin->nbFiles > 2) {
+            for (int x = 1; x < (origin->nbFiles - 1) ; x++) {
+                temp2 = genRandLong(&r) % (origin->avgSize + rest + 1);
+                if ((origin->avgSize + rest) > 4)
+                    while (temp2 <= (((origin->avgSize + rest) / 4) * 3))
+                        temp2 = genRandLong(&r) % (origin->avgSize + rest + 1);
+                if ((origin->avgSize + rest) <= 4)
+                    while (temp2 <= 1)
+                        temp2 = genRandLong(&r) % (origin->avgSize + rest + 1);
+                rest = (origin->avgSize + rest) - temp2;
+                create_newcase_chainfiles(chainFiles, temp2);
+                temp += temp2;
+            }
         }
         temp2 = (origin->originSize - temp);
         create_newcase_chainfiles(chainFiles, temp2);
@@ -138,9 +133,9 @@ void create_file_and_write(files_s *chainFiles, filecut_s *origin)
     /* Creation des différentes variables et ouverture du fichier d'origine en lecture */
     FILE *fo = fopen(origin->path, "r");
     files_s *temp = chainFiles->first;
-    int blockSize = 0, i = 0;
     char *buff;
     char *oldPath = my_strdup(origin->path);
+    long long blockSize = 0, i = 0;
 
     /*  je reinitialise rand avec la même graine*/
     MTRand r = seedRand(origin->seed);
@@ -152,8 +147,8 @@ void create_file_and_write(files_s *chainFiles, filecut_s *origin)
     for (temp = chainFiles->first; temp != NULL; temp = temp->next, i++) {
         temp->name = malloc(sizeof(char) * (30));
         temp->header = malloc(sizeof(char) * (1000000));
-        sprintf(temp->name, "%sbloc_%d.pine", origin->path, i);;
-        sprintf(temp->header, "[%d;%d;%d;%d;%d]", origin->nbFiles, origin->seed, temp->size, origin->originSize, i);
+        sprintf(temp->name, "%sbloc_%lld.pine", origin->path, i);;
+        sprintf(temp->header, "[%d;%ld;%lld;%lld;%lld]", origin->nbFiles, origin->seed, temp->size, origin->originSize, i);
         temp->fd = fopen(temp->name, "w+");
         fclose(temp->fd);
         temp->fd = fopen(temp->name, "a+");
@@ -165,15 +160,18 @@ void create_file_and_write(files_s *chainFiles, filecut_s *origin)
     si la taille restante est au dessus de 1000 cela permet d'être plus rapide (cette partie peut être modifié à l'avenir*/
     for (int choose = 0 ; verif_all_file_complete(chainFiles);) {
         choose = genRandLong(&r) % (origin->nbFiles);
+        printf("%sChoose : %d%s", JAUNE, choose, NORMAL);
         for (temp = chainFiles->first; temp != NULL && choose > 0; temp = temp->next, choose--);
+        printf ("%s Size : %lld %s\n", BLEU, temp->size, NORMAL);
         if (temp->size > 0) {
             if (temp->size > 1000) {
-                for (int x = 100; (x * 10) < temp->size && x < 10000000; x += 100, blockSize = x);
+                blockSize = 0;
+                for (long long x = 100; (x * 10) < temp->size && x < 10000000; x += 100, blockSize = x);
                 buff = malloc(sizeof(char) * (blockSize));
-                temp->size -= blockSize;
                 fread (buff, blockSize, 1, fo);
                 fwrite(buff, blockSize, 1, temp->fd);
                 free (buff);
+                temp->size -= blockSize;
             }
             else if (temp->size <= 1000) {
                 (temp->size / 2) > 0 ? blockSize = (temp->size / 2) :0;
@@ -192,7 +190,7 @@ void create_file_and_write(files_s *chainFiles, filecut_s *origin)
     }
     /*fermeture du flux et suppressuon du fichier d'origine*/
     fclose (fo);
-    remove(oldPath);
+    //remove(oldPath);
     free (oldPath);
 }
 
