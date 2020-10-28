@@ -163,7 +163,7 @@ void create_file_and_write(files_s *chainFiles, filecut_s *origin)
         fclose (temp->fd);
     }
     fclose (fo);
-    //remove(oldPath);
+    remove(oldPath);
     free (oldPath);
 }
 
