@@ -10,7 +10,6 @@ NAME	=	FileCut
 SRC	=	src/main.c	\
 		src/cut/parse_cut.c	\
 		src/cut/cut.c	\
-		src/cut/check_or_print_error.c	\
 		src/uncut/parse_uncut.c	\
 		src/uncut/uncut.c	\
 
