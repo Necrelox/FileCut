@@ -31,6 +31,12 @@
 /* Error */
 #define ERROR 84
 
+
+#define N_30GO 30000000000
+#define N_20GO 20000000000
+#define BUFFER 65536
+#define MIN_BLOCKSIZE 2
+
 typedef struct filecut_t
 {
     long seed;
@@ -70,7 +76,7 @@ int main (int ac, char **av);
 /* Print all error and return if print*/
 int print_all_error(filecut_s *filecut, char **av);
 /* Verif it's a correct path */
-int verif_path_of_file(char *path);
+int verif_path(char *path);
 /* Verify it's only a number */
 int verif_if_number(char *str);
 /* Verif arg and prepare a struct with setting*/

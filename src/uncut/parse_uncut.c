@@ -31,7 +31,7 @@ char *check_and_modif_path(char *path)
             newpath[i] = samePath[i];
         newpath[i] = '\0';
     }
-    return (newpath);
+    return newpath;
 }
 
 int verif_is_repo(char *path)
@@ -39,8 +39,8 @@ int verif_is_repo(char *path)
     struct stat info;
     stat(path, &info);
     if (S_ISDIR(info.st_mode) == 1)
-        return (1);
-    return (84);
+        return 1;
+    return 84;
 }
 
 int parse_uncut(char **av)
@@ -48,12 +48,12 @@ int parse_uncut(char **av)
     char *path = check_and_modif_path(av[2]);
     if (verif_is_repo(path) == 84) {
         free (path);
-        return (84);
+        return 84;
     }
     if (uncut(path) == 84) {
         free (path);
-        return (84);
+        return 84;
     }
     free (path);
-    return (0);
+    return 0;
 }

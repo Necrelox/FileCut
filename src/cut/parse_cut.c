@@ -17,7 +17,7 @@ int print_all_error(filecut_s *filecut, char **av)
         bool++;
         break;
     case ERROR_SMALL_FILES :
-        printf ("%sERROR %s%s%s THIS FILE IS TOO SMALL NEED MINIMUM 4 OCTETS %s\n", ROUGE, VERT, av[2], ROUGE, NORMAL);
+        printf ("%sERROR, %s%s%s FILE IS EMPTY%s\n", ROUGE, VERT, av[2], ROUGE, NORMAL);
         bool++;
         break;
     case ERROR_REPO :
@@ -32,17 +32,17 @@ int print_all_error(filecut_s *filecut, char **av)
         bool = 0;
         break;
     }
-    return (bool);
+    return bool;
 }
 
-int verif_path_of_file(char *path)
+int verif_path(char *path)
 {
     struct stat buff;
     if (stat(path, &buff) == -1)
-        return (ERROR_PATH);
+        return ERROR_PATH;
     if (S_ISDIR(buff.st_mode) == 1)
-        return (ERROR_REPO);
-    return (0);
+        return ERROR_REPO;
+    return 0;
 }
 
 int verif_if_number(char *str)
@@ -52,8 +52,8 @@ int verif_if_number(char *str)
         if (str[i] > 47 && str[i] < 58)
             count++;
     if ((i - count) == 0)
-        return (1);
-    return (0);
+        return 1;
+    return 0;
 }
 
 filecut_s *verify_arg_and_set_filecut_settings(int ac, char **av)
@@ -69,39 +69,40 @@ filecut_s *verify_arg_and_set_filecut_settings(int ac, char **av)
         if (ac == 4) {
             if (verif_if_number(av[3]) == 0) {
                 origin->error = ERROR_ARG3;
-                return (origin);
+                return origin;
             }
             origin->nbFiles = atoi(av[3]);
         }
         if (origin->nbFiles <= 1)
             origin->nbFiles = 5;
-        if ((origin->error = verif_path_of_file(av[2])) != 0)
-            return (origin);
+
+        if ((origin->error = verif_path(av[2])) != 0)
+            return origin;
         else { 
             stat(av[2], &info);
             origin->originSize = info.st_size;
-            if (origin->originSize < 4) {
+            if (origin->originSize == 0) {
                 origin->error = ERROR_SMALL_FILES;
-                return (origin);
+                return origin;
             }
         }
     }
-    return (origin);
+    return origin;
 }
 
 int parse_cut(int ac, char **av, int seed)
 {
     filecut_s *origin = verify_arg_and_set_filecut_settings(ac, av);
     if (origin == NULL)
-        return (ERROR);
+        return ERROR;
     origin->seed = seed;
 
     if (print_all_error(origin, av) != 0) {
         free (origin);
-        return (ERROR);
+        return ERROR;
     }
     cut(origin);
     free (origin->path);
     free (origin);
-    return (0);
+    return 0;
 }

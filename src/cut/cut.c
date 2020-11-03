@@ -34,20 +34,17 @@ files_s *prepare_chain_random_files_and_size(filecut_s *origin)
     dif = origin->originSize - (origin->avgSize * origin->nbFiles);
 
     if (origin->avgSize > 1) {
-
         chainFiles->size = genRandLong(&r) % (origin->avgSize + dif + 1);
         if ((origin->avgSize + dif) > 4) {
             chainFiles->size = ((origin->avgSize + dif) / 4) * 3;
             chainFiles->size += genRandLong(&r) % ((origin->avgSize + dif ) - chainFiles->size + 1);
         }
-
         if ((origin->avgSize + dif) <= 4) {
             while (chainFiles->size <= 1)
                 chainFiles->size = genRandLong(&r) % (origin->avgSize + dif + 1);
         }
         rest = (origin->avgSize + dif) - chainFiles->size;
         temp = chainFiles->size;
-
         if (origin->nbFiles > 2) {
             for (int x = 1; x < (origin->nbFiles - 1) ; x++) {
                 temp2 = genRandLong(&r) % (origin->avgSize + rest + 1);
@@ -68,10 +65,10 @@ files_s *prepare_chain_random_files_and_size(filecut_s *origin)
         }
         temp2 = (origin->originSize - temp);
         create_newcase_chainfiles(chainFiles, temp2);
-        return (chainFiles);
+        return chainFiles;
     }
     free (chainFiles);
-    return (NULL);
+    return NULL;
 }
 
 int verif_all_file_complete(files_s *chainFiles)
@@ -80,8 +77,8 @@ int verif_all_file_complete(files_s *chainFiles)
 
     for (;temp != NULL && temp->size == 0; temp = temp->next);
     if (temp != NULL)
-        return (1);
-    return (0);
+        return 1;
+    return 0;
 }
 
 char *prepare_new_path(filecut_s *origin)
@@ -102,16 +99,16 @@ char *prepare_new_path(filecut_s *origin)
         for (; j < i; j++)
             newpath[j] = origin->path[j];
         newpath[j] = '\0';
-        return (newpath);
+        return newpath;
     }
     else if (count == 0) {
         newpath = malloc(sizeof(char) * (3));
         for (i = 0; samePath[i] != '\0'; i++)
             newpath[i] = samePath[i];
         newpath[i] = '\0';
-        return (newpath);
+        return newpath;
     }
-    return (NULL);
+    return NULL;
 }
 
 void create_file_and_write(files_s *chainFiles, filecut_s *origin)
@@ -136,29 +133,27 @@ void create_file_and_write(files_s *chainFiles, filecut_s *origin)
         fwrite(temp->header, strlen(temp->header), 1, temp->fd);
     }
 
+    buff = malloc(sizeof(char) * (65536 + 1));
     for (int choose = 0 ; verif_all_file_complete(chainFiles);) {
         choose = genRandLong(&r) % (origin->nbFiles);
         for (temp = chainFiles->first; temp != NULL && choose > 0; temp = temp->next, choose--);
         if (temp->size > 0) {
             if (temp->size >= (65536 * 2)) {
                 blockSize = 65536;
-                buff = malloc(sizeof(char) * (blockSize));
                 fread (buff, blockSize, 1, fo);
                 fwrite(buff, blockSize, 1, temp->fd);
-                free (buff);
                 temp->size -= blockSize;
             }
             else if (temp->size < (65536 * 2)) {
                 (temp->size / 2) > 0 ? blockSize = (temp->size / 2) :0;
                 (temp->size / 2) == 0 ? blockSize = 1 :0;
-                buff = malloc(sizeof(char) * (blockSize));
                 temp->size -= blockSize;
                 fread (buff, blockSize, 1, fo);
                 fwrite(buff, blockSize, 1, temp->fd);
-                free(buff);
             }
         }
     }
+    free (buff);
     for (temp = chainFiles->first; temp != NULL; temp = temp->next) {
         fclose (temp->fd);
     }

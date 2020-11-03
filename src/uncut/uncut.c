@@ -33,8 +33,8 @@ int verif_its_good_file(char *path)
     for (; i > 0 && path[i] != '.'; i--);
     for (;path[i] != '\0' && extension[j] != '\0' && path[i] == extension[j]; i++, j++);
     if (path[i] == extension[j])
-        return (0);
-    return (1);
+        return 0;
+    return 1;
 }
 
 char *recup_header_in_file(char *name)
@@ -57,7 +57,7 @@ char *recup_header_in_file(char *name)
         if (search[j] != '\0') {
             free(buff);
             fclose(fd);
-            return (NULL);
+            return NULL;
         }
         fclose(fd);
         free (buff);
@@ -66,11 +66,11 @@ char *recup_header_in_file(char *name)
         fread (header, i, 1, fd);
         header[i] = '\0';
         fclose(fd);
-        return (header);
+        return header;
     }
     fclose (fd);
     free (buff);
-    return (NULL);
+    return NULL;
 }
 
 void create_newcase_chain(files_s *chain, char *path, char *header)
@@ -103,7 +103,7 @@ files_s *prepare_chain_file(char *path)
     if (dir == NULL) {
         closedir(dir);
         free_chain(chain);
-        return (NULL);
+        return NULL;
     }
 
     for (int i = 0;(readir = readdir(dir)) != NULL; i++) {
@@ -114,7 +114,7 @@ files_s *prepare_chain_file(char *path)
                 free_chain(chain);
                 closedir(dir);
                 printf ("%s ERROR HEADER ON %s%s\n", ROUGE, name, NORMAL);
-                return (NULL);
+                return NULL;
             }
             pine++;
             create_newcase_chain(chain, name, header);
@@ -122,14 +122,14 @@ files_s *prepare_chain_file(char *path)
     }
     if (closedir(dir) == -1) {
         free_chain(chain);
-        return (NULL);
+        return NULL;
     }
     if (pine == 0) {
         printf("%sERROR NO FILE .PINE%s\n", ROUGE, NORMAL);
         free_chain(chain);
-        return (NULL);
+        return NULL;
     }
-    return (chain);
+    return chain;
 }
 
 char **header_to_tab(char *header)
@@ -157,7 +157,7 @@ char **header_to_tab(char *header)
         tab[i][x] = '\0';
     }
     tab[i] = NULL;
-    return (tab);
+    return tab;
 }
 
 fileuncut_s *get_and_prepare_info(files_s *chain, char *path)
@@ -179,7 +179,7 @@ fileuncut_s *get_and_prepare_info(files_s *chain, char *path)
     }
     origin->path = malloc(sizeof(char) * (strlen(path) + 15));
     sprintf(origin->path, "%sOrigin", path);
-    return (origin);
+    return origin;
 }
 
 int verif_all_file_is_empty(files_s *chain)
@@ -188,8 +188,8 @@ int verif_all_file_is_empty(files_s *chain)
 
     for (; use != NULL && use->size == 0; use = use->next);
     if (use != NULL)
-        return (1);
-    return (0);
+        return 1;
+    return 0;
 }
 
 void create_original_file(files_s *chain, fileuncut_s *origin)
@@ -238,11 +238,11 @@ int uncut(char *path)
 {
     files_s *chain = prepare_chain_file(path);
     if (chain == NULL)
-        return (84);
+        return 84;
     fileuncut_s *origin = get_and_prepare_info(chain, path);
     create_original_file(chain, origin);
     free_chain(chain);
     free (origin->path);
     free (origin);
-    return (0);
+    return 0;
 }
