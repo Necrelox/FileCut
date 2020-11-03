@@ -25,7 +25,7 @@ int print_all_error(filecut_s *filecut, char **av)
         bool++;
         break;
     case ERROR_PATH :
-        printf ("%sERROR PATH, FILES NOT EXIST : %s%s %s\n", ROUGE, VERT, av[2],NORMAL);
+        printf ("%sERROR PATH : %s%s FILES NOT EXIST %s\n", ROUGE, VERT, av[2],NORMAL);
         bool++;
         break;
     default:
