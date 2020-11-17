@@ -12,7 +12,7 @@ void create_newcase_chainfiles(files_s *chainFiles, long long size)
     files_s *newcase = malloc(sizeof(*newcase));
 
     newcase->size = size;
-    for (; chainFiles->next != NULL; chainFiles = chainFiles->next);
+    // for (; chainFiles->next != NULL; chainFiles = chainFiles->next);
     chainFiles->next = newcase;
     newcase->next = NULL;
     newcase->prev = chainFiles;
@@ -60,6 +60,7 @@ files_s *prepare_chain_random_files_and_size(filecut_s *origin)
 
                 rest = (origin->avgSize + rest) - temp2;
                 create_newcase_chainfiles(chainFiles, temp2);
+                chainFiles = chainFiles->next;
                 temp += temp2;
             }
         }
@@ -67,7 +68,7 @@ files_s *prepare_chain_random_files_and_size(filecut_s *origin)
         create_newcase_chainfiles(chainFiles, temp2);
         return chainFiles;
     }
-    free (chainFiles);
+    free (chainFiles->first);
     return NULL;
 }
 

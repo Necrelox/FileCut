@@ -79,7 +79,7 @@ void create_newcase_chain(files_s *chain, char *path, char *header)
 
     newcase->name = my_strdup(path);
     newcase->header = header;
-    for (;chain->next != NULL; chain = chain->next);
+    // for (;chain->next != NULL; chain = chain->next);
     chain->next = newcase;
     newcase->next = NULL;
     newcase->prev = chain;
@@ -118,6 +118,7 @@ files_s *prepare_chain_file(char *path)
             }
             pine++;
             create_newcase_chain(chain, name, header);
+            chain = chain->next;
         }
     }
     if (closedir(dir) == -1) {
@@ -129,7 +130,7 @@ files_s *prepare_chain_file(char *path)
         free_chain(chain);
         return NULL;
     }
-    return chain;
+    return chain->first;
 }
 
 char **header_to_tab(char *header)

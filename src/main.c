@@ -23,6 +23,7 @@ int main (int ac, char **av)
     #else
         int seed = getpid();
     #endif
+
     if (ac > 1 && ac < 5) {
         if (my_strcmp(av[1], "cut") == 0) {
             clock_t t1 = clock();
